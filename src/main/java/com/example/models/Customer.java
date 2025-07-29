@@ -1,62 +1,24 @@
 package com.example.models;
 
-public class Customer {
-    private String id;
-    private String fullName;
-    private String username;
-    private String email;
-    private String phoneNumber;
+public class Customer extends User {
     private String location;
-    private String joinDate;
-    private String password;
+    private boolean isAdmin;
 
     public Customer(String fullName, String username, String email, String phoneNumber, String location) {
-        this.id = java.util.UUID.randomUUID().toString();
-        this.fullName = fullName;
-        this.username = username;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
+        super(fullName, username, email, phoneNumber);
         this.location = location;
-        this.joinDate = java.time.LocalDate.now().toString();
+        this.isAdmin = false;
+    }
+    
+    // Constructor with password for registration
+    public Customer(String fullName, String username, String email, String phoneNumber, String location, String password) {
+        super(fullName, username, email, phoneNumber);
+        this.location = location;
+        this.isAdmin = false;
+        setPassword(password);
     }
 
-    // Getters and Setters
-    public String getId() {
-        return id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
+    // Location-specific getters and setters
     public String getLocation() {
         return location;
     }
@@ -65,19 +27,48 @@ public class Customer {
         this.location = location;
     }
 
-    public String getJoinDate() {
-        return joinDate;
+    // Admin-specific methods
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+    
+    public void setAdmin(boolean admin) {
+        this.isAdmin = admin;
     }
 
-    public void setJoinDate(String joinDate) {
-        this.joinDate = joinDate;
+    // Abstract method implementations from User
+    @Override
+    public String getUserType() {
+        return "Customer";
     }
 
-    public String getPassword() {
-        return password;
+    @Override
+    public boolean hasPermission(String permission) {
+        if (isAdmin) {
+            return true; // Admins have all permissions
+        }
+        
+        // Regular customer permissions
+        switch (permission.toLowerCase()) {
+            case "place_order":
+            case "view_products":
+            case "view_profile":
+            case "update_profile":
+            case "view_orders":
+            case "cancel_order":
+                return true;
+            case "manage_users":
+            case "manage_products":
+            case "view_reports":
+            case "manage_farmers":
+                return false;
+            default:
+                return false;
+        }
     }
-
-    public void setPassword(String password) {
-        this.password = password;
+    
+    // Legacy compatibility method for joinDate as String
+    public String getJoinDateString() {
+        return getJoinDate().toString();
     }
 }
